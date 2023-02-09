@@ -1,4 +1,4 @@
-module github.com/conduitio/conduit-connector-connectorname
+module github.com/github.com/maha-hajja/conduit-connector-weather
 
 go 1.19
 

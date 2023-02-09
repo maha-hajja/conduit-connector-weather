@@ -1,58 +1,33 @@
-package connectorname
+// Copyright © 2023 Meroxa, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-import "errors"
+//go:generate paramgen -output=paramgen_src.go SourceConfig
 
-const (
-	GlobalConfigParam      = "global_config"
-	SourceConfigParam      = "source_config"
-	DestinationConfigParam = "destination_config"
-)
+package weather
 
-var Required = []string{GlobalConfigParam}
-
-var (
-	ErrEmptyConfig = errors.New("missing or empty config")
-)
-
-type Config struct {
-	globalConfigParam string
-}
+import "time"
 
 type SourceConfig struct {
-	Config
-	sourceConfigParam string
-}
-
-type DestinationConfig struct {
-	Config
-	destinationConfigParam string
-}
-
-func ParseSourceConfig(cfg map[string]string) (SourceConfig, error) {
-	err := checkEmpty(cfg)
-	if err != nil {
-		return SourceConfig{}, err
-	}
-	return SourceConfig{
-		Config:            Config{globalConfigParam: cfg[GlobalConfigParam]},
-		sourceConfigParam: cfg[SourceConfigParam],
-	}, nil
-}
-
-func ParseDestinationConfig(cfg map[string]string) (DestinationConfig, error) {
-	err := checkEmpty(cfg)
-	if err != nil {
-		return DestinationConfig{}, err
-	}
-	return DestinationConfig{
-		Config:                 Config{globalConfigParam: cfg[GlobalConfigParam]},
-		destinationConfigParam: cfg[DestinationConfigParam],
-	}, nil
-}
-
-func checkEmpty(cfg map[string]string) error {
-	if len(cfg) == 0 {
-		return ErrEmptyConfig
-	}
-	return nil
+	// url that contains the weather data
+	URL string `json:"url" default:"https://api.openweathermap.org/data/2.5/weather"`
+	// how often the connector will get data from the url
+	PollingPeriod time.Duration `json:"pollingPeriod" default:"5m"`
+	// city name to get the current weather for, ex: California, San Francisco, london. you can find the cities list
+	// {city.list.json.gz} on http://bulk.openweathermap.org/sample/
+	City string `json:"city" default:"new york"`
+	// your unique API key (you can always find it on your account page under https://home.openweathermap.org/api_keys)
+	APPID string `json:"appid" validate:"required"`
+	// units of measurement, for Fahrenheit use imperial, for Celsius use metric, for Kelvin use standard.
+	Units string `json:"units" default:"imperial" validate:"inclusion=imperial|standard|metric"`
 }
