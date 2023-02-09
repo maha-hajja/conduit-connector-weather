@@ -17,7 +17,7 @@ package main
 import (
 	sdk "github.com/conduitio/conduit-connector-sdk"
 
-	weather "github.com/github.com/maha-hajja/conduit-connector-weather"
+	weather "github.com/github.com/conduitio-labs/conduit-connector-weather"
 )
 
 func main() {
