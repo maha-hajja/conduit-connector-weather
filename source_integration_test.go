@@ -16,7 +16,6 @@ package weather_test
 
 import (
 	"context"
-	"errors"
 	"os"
 	"testing"
 	"time"
@@ -46,14 +45,15 @@ func TestSource_GetWeather(t *testing.T) {
 	err = con.Open(ctx, sdk.Position{})
 	is.NoErr(err)
 	// first read should succeed
+	timeBefore := time.Now()
 	_, err = con.Read(ctx)
 	is.NoErr(err)
-	// it hasn't been 3 seconds yet, second read should fail
-	rec, err := con.Read(ctx)
-	is.True(errors.Is(err, sdk.ErrBackoffRetry))
-	is.Equal(rec, sdk.Record{})
-	// delay 3 seconds, read should work now
-	time.Sleep(3 * time.Second)
+	// second read will block for 3 seconds then get record
 	_, err = con.Read(ctx)
 	is.NoErr(err)
+	// get the elapsed time since the first read
+	elapsed := time.Since(timeBefore)
+	seconds := elapsed.Seconds()
+	// elapsed time should be greater than 3 seconds
+	is.True(seconds >= 3)
 }

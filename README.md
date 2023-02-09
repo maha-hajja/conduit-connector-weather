@@ -46,7 +46,7 @@ here's a pipeline configuration file sample:
          settings:
            path: ./weather.txt
            sdk.record.format: template
-           sdk.record.format.options: '{{ toJson .Payload.After }}'
+           sdk.record.format.options: '{{ toPrettyJson .Payload.After }}'
 ```
 make sure to export your appid key to the env variable $APPID before running conduit.
 check [Pipeline Configuration Files Docs](https://github.com/ConduitIO/conduit/blob/main/docs/pipeline_configuration_files.md) to run this pipeline.

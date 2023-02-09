@@ -77,14 +77,15 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 }
 
 func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
-	if s.limiter.Allow() {
-		rec, err := s.getRecord(ctx)
-		if err != nil {
-			return sdk.Record{}, fmt.Errorf("error getting the weather data: %w", err)
-		}
-		return rec, nil
+	err := s.limiter.Wait(ctx)
+	if err != nil {
+		return sdk.Record{}, fmt.Errorf("context was cancelled: %w", err)
 	}
-	return sdk.Record{}, sdk.ErrBackoffRetry
+	rec, err := s.getRecord(ctx)
+	if err != nil {
+		return sdk.Record{}, fmt.Errorf("error getting the weather data: %w", err)
+	}
+	return rec, nil
 }
 
 func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
