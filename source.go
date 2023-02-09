@@ -79,7 +79,7 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
 	err := s.limiter.Wait(ctx)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("context was cancelled: %w", err)
+		return sdk.Record{}, err
 	}
 	rec, err := s.getRecord(ctx)
 	if err != nil {
@@ -116,6 +116,10 @@ func (s *Source) getRecord(ctx context.Context) (sdk.Record, error) {
 		return sdk.Record{}, fmt.Errorf("error getting data from URL: %w", err)
 	}
 	defer resp.Body.Close()
+	// check response status
+	if resp.StatusCode != http.StatusOK {
+		return sdk.Record{}, fmt.Errorf("response status should be %v, got status=%v", http.StatusOK, resp.StatusCode)
+	}
 	// read body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
