@@ -1,4 +1,4 @@
-module github.com/github.com/conduitio-labs/conduit-connector-weather
+module github.com/conduitio-labs/conduit-connector-weather
 
 go 1.19
 

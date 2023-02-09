@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
+	weather "github.com/conduitio-labs/conduit-connector-weather"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	weather "github.com/github.com/conduitio-labs/conduit-connector-weather"
 	"github.com/matryer/is"
 )
 
