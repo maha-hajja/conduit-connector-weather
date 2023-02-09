@@ -1,14 +1,9 @@
-.PHONY: build test test-integration
+.PHONY: build test
+
+VERSION=$(shell git describe --tags --dirty --always)
 
 build:
-	go build -o conduit-connector-connectorname cmd/connector/main.go
+	go build -ldflags "-X 'github.com/conduitio-labs/conduit-connector-weather.version=${VERSION}'" -o conduit-connector-weather cmd/connector/main.go
 
 test:
 	go test $(GOTEST_FLAGS) -v -race ./...
-
-test-integration:
-	# run required docker containers, execute integration tests, stop containers after tests
-	docker compose -f test/docker-compose.yml up -d
-	go test $(GOTEST_FLAGS) -v -race ./...; ret=$$?; \
-		docker compose -f test/docker-compose.yml down; \
-		exit $$ret
