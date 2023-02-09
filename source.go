@@ -66,10 +66,10 @@ func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
 	if err != nil {
 		return fmt.Errorf("error pinging URL %q: %w", s.config.URL, err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusUnauthorized {
 		return fmt.Errorf("authorization failed, check your APPID key")
 	}
-	defer resp.Body.Close()
 
 	s.limiter = rate.NewLimiter(rate.Every(s.config.PollingPeriod), 1)
 
@@ -138,8 +138,8 @@ func (s *Source) getRecord(ctx context.Context) (sdk.Record, error) {
 			After:  structData,
 		},
 		Operation: sdk.OperationCreate,
-		Position:  sdk.Position(fmt.Sprintf("%v", timestamp)),
-		Key:       sdk.RawData(fmt.Sprintf("unix-%v", now)),
+		Position:  sdk.Position(fmt.Sprintf("unix-%v", now)),
+		Key:       sdk.RawData(fmt.Sprintf("%v", timestamp)),
 	}
 	return rec, nil
 }
