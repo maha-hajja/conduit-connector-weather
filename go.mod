@@ -3,7 +3,7 @@ module github.com/conduitio-labs/conduit-connector-weather
 go 1.20
 
 require (
-	github.com/conduitio/conduit-connector-sdk v0.7.0
+	github.com/conduitio/conduit-connector-sdk v0.7.1
 	github.com/matryer/is v1.4.1
 	golang.org/x/time v0.3.0
 )
