@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/conduitio/conduit-connector-sdk v0.7.2
 	github.com/matryer/is v1.4.1
-	golang.org/x/time v0.4.0
+	golang.org/x/time v0.5.0
 )
 
 require (
