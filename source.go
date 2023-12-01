@@ -54,7 +54,7 @@ func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
 	return nil
 }
 
-func (s *Source) Open(ctx context.Context, pos sdk.Position) error {
+func (s *Source) Open(ctx context.Context, _ sdk.Position) error {
 	s.client = &http.Client{}
 	s.url = s.CreateRequestURL()
 	// try pinging the URL with APPID
@@ -93,7 +93,7 @@ func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
 	return nil // no ack needed
 }
 
-func (s *Source) Teardown(ctx context.Context) error {
+func (s *Source) Teardown(_ context.Context) error {
 	if s.client != nil {
 		s.client.CloseIdleConnections()
 	}
