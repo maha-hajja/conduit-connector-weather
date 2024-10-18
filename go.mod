@@ -7,7 +7,7 @@ require (
 	github.com/conduitio/conduit-connector-sdk v0.11.0
 	github.com/golangci/golangci-lint v1.61.0
 	github.com/matryer/is v1.4.1
-	go.uber.org/mock v0.4.0
+	go.uber.org/mock v0.5.0
 	golang.org/x/time v0.7.0
 )
 
