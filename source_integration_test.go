@@ -21,7 +21,7 @@ import (
 	"time"
 
 	weather "github.com/conduitio-labs/conduit-connector-weather"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/matryer/is"
 )
 
@@ -42,7 +42,7 @@ func TestSource_GetWeather(t *testing.T) {
 	})
 	is.NoErr(err)
 	ctx := context.Background()
-	err = con.Open(ctx, sdk.Position{})
+	err = con.Open(ctx, opencdc.Position{})
 	is.NoErr(err)
 	// first read should succeed
 	timeBefore := time.Now()

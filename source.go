@@ -22,6 +22,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/conduitio/conduit-commons/config"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"golang.org/x/time/rate"
 )
@@ -39,22 +41,16 @@ func NewSource() sdk.Source {
 	return &Source{}
 }
 
-func (s *Source) Parameters() map[string]sdk.Parameter {
+func (s *Source) Parameters() config.Parameters {
 	return s.config.Parameters()
 }
 
-func (s *Source) Configure(ctx context.Context, cfg map[string]string) error {
+func (s *Source) Configure(ctx context.Context, cfg config.Config) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Weather Source Connector...")
-	var config SourceConfig
-	err := sdk.Util.ParseConfig(cfg, &config)
-	if err != nil {
-		return err
-	}
-	s.config = config
-	return nil
+	return sdk.Util.ParseConfig(ctx, cfg, &s.config, NewSource().Parameters())
 }
 
-func (s *Source) Open(ctx context.Context, _ sdk.Position) error {
+func (s *Source) Open(ctx context.Context, _ opencdc.Position) error {
 	s.client = &http.Client{}
 	s.url = s.CreateRequestURL()
 	// try pinging the URL with APPID
@@ -76,19 +72,19 @@ func (s *Source) Open(ctx context.Context, _ sdk.Position) error {
 	return nil
 }
 
-func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
+func (s *Source) Read(ctx context.Context) (opencdc.Record, error) {
 	err := s.limiter.Wait(ctx)
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 	rec, err := s.getRecord(ctx)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("error getting the weather data: %w", err)
+		return opencdc.Record{}, fmt.Errorf("error getting the weather data: %w", err)
 	}
 	return rec, nil
 }
 
-func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
+func (s *Source) Ack(ctx context.Context, position opencdc.Position) error {
 	sdk.Logger(ctx).Debug().Str("position", string(position)).Msg("got ack")
 	return nil // no ack needed
 }
@@ -104,47 +100,47 @@ func (s *Source) CreateRequestURL() string {
 	return s.config.URL + "?" + "q=" + s.config.City + "&" + "APPID=" + s.config.APPID + "&" + "units=" + s.config.Units
 }
 
-func (s *Source) getRecord(ctx context.Context) (sdk.Record, error) {
+func (s *Source) getRecord(ctx context.Context) (opencdc.Record, error) {
 	// create GET request
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.url, nil)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("error creating HTTP request: %w", err)
+		return opencdc.Record{}, fmt.Errorf("error creating HTTP request: %w", err)
 	}
 	// get response
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("error getting data from URL: %w", err)
+		return opencdc.Record{}, fmt.Errorf("error getting data from URL: %w", err)
 	}
 	defer resp.Body.Close()
 	// check response status
 	if resp.StatusCode != http.StatusOK {
-		return sdk.Record{}, fmt.Errorf("response status should be %v, got status=%v", http.StatusOK, resp.StatusCode)
+		return opencdc.Record{}, fmt.Errorf("response status should be %v, got status=%v", http.StatusOK, resp.StatusCode)
 	}
 	// read body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("error reading body for response %v: %w", resp, err)
+		return opencdc.Record{}, fmt.Errorf("error reading body for response %v: %w", resp, err)
 	}
 	// parse json
-	var structData sdk.StructuredData
+	var structData opencdc.StructuredData
 	err = json.Unmarshal(body, &structData)
 	if err != nil {
-		return sdk.Record{}, fmt.Errorf("failed to unmarshal body as JSON: %w", err)
+		return opencdc.Record{}, fmt.Errorf("failed to unmarshal body as JSON: %w", err)
 	}
 	// create record
 	now := time.Now().Unix()
 	timestamp, ok := structData["dt"]
 	if !ok {
-		return sdk.Record{}, fmt.Errorf("dt field not found in record: %w", err)
+		return opencdc.Record{}, fmt.Errorf("dt field not found in record: %w", err)
 	}
-	rec := sdk.Record{
-		Payload: sdk.Change{
+	rec := opencdc.Record{
+		Payload: opencdc.Change{
 			Before: nil,
 			After:  structData,
 		},
-		Operation: sdk.OperationCreate,
-		Position:  sdk.Position(fmt.Sprintf("unix-%v", now)),
-		Key:       sdk.RawData(fmt.Sprintf("%v", timestamp)),
+		Operation: opencdc.OperationCreate,
+		Position:  opencdc.Position(fmt.Sprintf("unix-%v", now)),
+		Key:       opencdc.RawData(fmt.Sprintf("%v", timestamp)),
 	}
 	return rec, nil
 }

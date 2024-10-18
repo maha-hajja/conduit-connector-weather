@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	weather "github.com/conduitio-labs/conduit-connector-weather"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/matryer/is"
 )
 
@@ -34,7 +34,7 @@ func TestSource_ConfigureAndOpen(t *testing.T) {
 	})
 	is.NoErr(err)
 	ctx := context.Background()
-	err = con.Open(ctx, sdk.Position{})
+	err = con.Open(ctx, opencdc.Position{})
 	is.True(err != nil) // auth failed
 	url := con.CreateRequestURL()
 	is.Equal(url, "https://api.openweathermap.org/data/2.5/weather?q=london&APPID=my-id&units=metric")
