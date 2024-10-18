@@ -3,45 +3,43 @@
 
 package weather
 
-import (
-	sdk "github.com/conduitio/conduit-connector-sdk"
-)
+import "github.com/conduitio/conduit-commons/config"
 
-func (SourceConfig) Parameters() map[string]sdk.Parameter {
-	return map[string]sdk.Parameter{
+func (SourceConfig) Parameters() config.Parameters {
+	return map[string]config.Parameter{
 		"appid": {
 			Default:     "",
 			Description: "your unique API key (you can always find it on your account page under https://home.openweathermap.org/api_keys)",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{
-				sdk.ValidationRequired{},
+			Type:        config.ParameterTypeString,
+			Validations: []config.Validation{
+				config.ValidationRequired{},
 			},
 		},
 		"city": {
 			Default:     "new york",
 			Description: "city name to get the current weather for, ex: California, San Francisco, london. you can find the cities list {city.list.json.gz} on http://bulk.openweathermap.org/sample/",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{},
+			Type:        config.ParameterTypeString,
+			Validations: []config.Validation{},
 		},
 		"pollingPeriod": {
 			Default:     "5m",
 			Description: "how often the connector will get data from the url",
-			Type:        sdk.ParameterTypeDuration,
-			Validations: []sdk.Validation{},
+			Type:        config.ParameterTypeDuration,
+			Validations: []config.Validation{},
 		},
 		"units": {
 			Default:     "imperial",
 			Description: "units of measurement, for Fahrenheit use imperial, for Celsius use metric, for Kelvin use standard.",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{
-				sdk.ValidationInclusion{List: []string{"imperial", "standard", "metric"}},
+			Type:        config.ParameterTypeString,
+			Validations: []config.Validation{
+				config.ValidationInclusion{List: []string{"imperial", "standard", "metric"}},
 			},
 		},
 		"url": {
 			Default:     "https://api.openweathermap.org/data/2.5/weather",
 			Description: "url that contains the weather data",
-			Type:        sdk.ParameterTypeString,
-			Validations: []sdk.Validation{},
+			Type:        config.ParameterTypeString,
+			Validations: []config.Validation{},
 		},
 	}
 }
