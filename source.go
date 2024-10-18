@@ -47,13 +47,7 @@ func (s *Source) Parameters() config.Parameters {
 
 func (s *Source) Configure(ctx context.Context, cfg config.Config) error {
 	sdk.Logger(ctx).Info().Msg("Configuring Weather Source Connector...")
-	var config SourceConfig
-	err := sdk.Util.ParseConfig(ctx, cfg, &config, NewSource().Parameters())
-	if err != nil {
-		return err
-	}
-	s.config = config
-	return nil
+	return sdk.Util.ParseConfig(ctx, cfg, &s.config, NewSource().Parameters())
 }
 
 func (s *Source) Open(ctx context.Context, _ opencdc.Position) error {
