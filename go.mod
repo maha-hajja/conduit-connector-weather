@@ -8,7 +8,7 @@ require (
 	github.com/golangci/golangci-lint v1.63.4
 	github.com/matryer/is v1.4.1
 	go.uber.org/mock v0.5.0
-	golang.org/x/time v0.9.0
+	golang.org/x/time v0.10.0
 )
 
 require (
